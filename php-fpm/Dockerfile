@@ -36,7 +36,7 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq && \
-    pecl channel-update pecl.php.net && \
+#    pecl channel-update pecl.php.net && \
     apt-get install -yqq \
       apt-utils \
       #
@@ -257,7 +257,7 @@ ARG INSTALL_PHPREDIS=false
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-      pecl install -o -f redis-4.3.0; \
+      pecl install -o -f redis-3.1.6; \
     else \
       pecl install -o -f redis; \
     fi \
@@ -285,6 +285,37 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
     docker-php-ext-enable swoole \
     && php -m | grep -q 'swoole' \
 ;fi
+
+###########################################################################
+# YAF EXTENSION
+###########################################################################
+
+ARG INSTALL_YAF=false
+
+RUN if [ ${INSTALL_YAF} = true ]; then \
+    # Install Php Yaf Extension
+    pecl install yac-2.0.2 yaf-3.0.7 && \
+    docker-php-ext-enable yac yaf && \
+    php -m | grep -q 'yaf' \
+;fi
+
+COPY yac.ini /usr/local/etc/php/conf.d/yac.ini
+COPY yaf.ini /usr/local/etc/php/conf.d/yaf.ini
+
+###########################################################################
+# Mcrypt EXTENSION
+###########################################################################
+
+ARG INSTALL_MCRYPT=false
+
+RUN if [ ${INSTALL_MCRYPT} = true ]; then \
+    # Install Php Mcrypt Extension
+    apt-get -y install libmcrypt-dev &&\
+    pecl install mcrypt-1.0.0 &&\
+    php -m | grep -q 'mcrypt' \
+;fi
+
+COPY mcrypt.ini /usr/local/etc/php/conf.d/mcrypt.ini
 
 ###########################################################################
 # Taint EXTENSION

@@ -59,6 +59,7 @@ RUN if [ ${CHANGE_SOURCE} = true ]; then \
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq && \
+    pecl channel-update https://pecl.php.net/channel.xml && \
     pecl channel-update pecl.php.net && \
     groupadd -g ${PGID} laradock && \
     useradd -u ${PUID} -g laradock -m laradock -G docker_env && \
@@ -537,6 +538,37 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
     echo "extension=swoole.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/swoole.ini && \
     ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/swoole.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-swoole.ini \
     && php -m | grep -q 'swoole' \
+;fi
+
+###########################################################################
+# YAF EXTENSION
+###########################################################################
+
+ARG INSTALL_YAF=false
+
+RUN if [ ${INSTALL_YAF} = true ]; then \
+    # Install Php Yaf Extension
+    pecl install yac yaf &&\
+    echo "extension=yaf.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yaf.ini && \
+    echo "extension=yac.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yac.ini && \
+          ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yaf.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-yaf.ini && \
+          ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/yac.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-yac.ini && \
+    php -m | grep -q 'yaf' \
+;fi
+
+###########################################################################
+# Mcrypt EXTENSION
+###########################################################################
+
+ARG INSTALL_MCRYPT=false
+
+RUN if [ ${INSTALL_MCRYPT} = true ]; then \
+    # Install Php mcrypt Extension
+    apt-get -y install libmcrypt-dev &&\
+    pecl install mcrypt-1.0.0 &&\
+    echo "extension=mcrypt.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/mcrypt.ini && \
+          ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/mcrypt.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/mcrypt.ini && \
+    php -m | grep -q 'mcrypt' \
 ;fi
 
 ###########################################################################
