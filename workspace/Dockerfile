@@ -566,8 +566,6 @@ RUN if [ ${INSTALL_MCRYPT} = true ]; then \
     # Install Php mcrypt Extension
     apt-get -y install libmcrypt-dev &&\
     pecl install mcrypt-1.0.0 &&\
-    echo "extension=mcrypt.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/mcrypt.ini && \
-          ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/mcrypt.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/mcrypt.ini && \
     php -m | grep -q 'mcrypt' \
 ;fi
 
